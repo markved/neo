@@ -89,11 +89,30 @@ namespace Neo.Network.RPC
                     }
                 case "getblockcount":
                     return Blockchain.Default.Height + 1;
-                case "getblockhash":
-                    {
-                        uint height = (uint)_params[0].AsNumber();
-                        return Blockchain.Default.GetBlockHash(height).ToString();
-                    }
+				case "getblockhash":
+					{
+						uint height = (uint)_params[0].AsNumber();
+						if (height >= 0 && height <= Blockchain.Default.Height)
+						{
+							return Blockchain.Default.GetBlockHash(height).ToString();
+						}
+						else
+						{
+							return "Invalid height";
+						}
+					}
+				case "getblocksysfee":
+					{
+						uint height = (uint)_params[0].AsNumber();
+						if (height >= 0 && height <= Blockchain.Default.Height)
+						{
+							return Blockchain.Default.GetSysFeeAmount(height).ToString();
+						}
+						else
+						{
+							return "Invalid height";
+						}
+					}
                 case "getconnectioncount":
                     return LocalNode.RemoteNodeCount;
                 case "getrawmempool":
