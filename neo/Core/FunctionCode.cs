@@ -1,5 +1,4 @@
 ﻿using Neo.IO;
-using Neo.IO.Json;
 using System.IO;
 using System.Linq;
 
@@ -38,16 +37,6 @@ namespace Neo.Core
             writer.WriteVarBytes(Script);
             writer.WriteVarBytes(ParameterList.Cast<byte>().ToArray());
             writer.Write((byte)ReturnType);
-        }
-
-        public JObject ToJson()
-        {
-            JObject json = new JObject();
-            json["hash"] = ScriptHash.ToString();
-            json["script"] = Script.ToHexString();
-            json["parameters"] = new JArray(ParameterList.Select(p => (JObject)p));
-            json["returntype"] = ReturnType;
-            return json;
         }
     }
 }

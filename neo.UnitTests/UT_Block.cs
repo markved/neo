@@ -88,6 +88,7 @@ namespace Neo.UnitTests
             uut.Header.ConsensusData.Should().Be(consensusDataVal);
             uut.Header.Script.Should().Be(scriptVal);
         }
+
         [TestMethod]
         public void Size_Get()
         {

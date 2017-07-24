@@ -17,7 +17,6 @@ namespace Neo.Core
         {
             get
             {
-                if (Version >= 1) return Fixed8.Zero;
                 if (Outputs.All(p => p.AssetId == Blockchain.SystemShare.Hash || p.AssetId == Blockchain.SystemCoin.Hash))
                     return Fixed8.Zero;
                 return base.SystemFee;
@@ -31,7 +30,7 @@ namespace Neo.Core
 
         protected override void DeserializeExclusiveData(BinaryReader reader)
         {
-            if (Version > 1) throw new FormatException();
+            if (Version != 0) throw new FormatException();
         }
 
         /// <summary>
