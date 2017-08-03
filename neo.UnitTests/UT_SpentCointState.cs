@@ -1,10 +1,9 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System;
 
 namespace Neo.UnitTests
 {
@@ -65,7 +64,7 @@ namespace Neo.UnitTests
         {
             transactionHash = new UInt256(TestUtils.GetByteArray(32, 0x20));
             spentCoinState.TransactionHash = transactionHash;
-            transactionHeight = 69u;
+            transactionHeight = 757859114;
             spentCoinState.TransactionHeight = transactionHeight;
             key = new ushort();
             dictVal = new uint();
@@ -75,20 +74,17 @@ namespace Neo.UnitTests
         }
         [TestMethod]
         public void DeserializeSCS()
-        {
-            byte[] dataArray = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 48, 42, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
-            Stream stream = new MemoryStream(dataArray);
-            try
-            {
+        {           
+            byte[] dataArray = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 2, 42, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
+            Stream stream = new MemoryStream(dataArray);            
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
                     uut.Deserialize(reader);
-                }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
+                }            
+            uut.TransactionHash.Should().Be(new UInt256(TestUtils.GetByteArray(32, 0x20)));
+            uut.TransactionHeight.Should().Be(757859114);
+            uut.Items.Should().ContainKey(42);
+            uut.Items[42].Should().Be(0);
         }
         [TestMethod]
         public void SerializeSCS()
@@ -108,20 +104,12 @@ namespace Neo.UnitTests
                     dataArray = stream.ToArray();
                 }
             }
-
-            byte[] requiredData = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 48, 42, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
-            dataArray.Length.Should().Be(44);
-            try
-            {
+            byte[] requiredData = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
+            dataArray.Length.Should().Be(44);          
                 for (int i = 0; i < 44; i++)
                 {
                     dataArray[i].Should().Be(requiredData[i]);
-                }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
+                }           
         }
 
     }
