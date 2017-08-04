@@ -31,6 +31,7 @@ namespace Neo.UnitTests
             uut.TransactionHash = val;
             uut.TransactionHash.Should().Be(val);
         }
+
         [TestMethod]
         public void TransactionHeight_Get()
         {
@@ -44,6 +45,7 @@ namespace Neo.UnitTests
             uut.TransactionHeight = val;
             uut.TransactionHeight.Should().Be(val);
         }
+
         [TestMethod]
         public void Items_Get()
         {
@@ -60,40 +62,51 @@ namespace Neo.UnitTests
             uut.Items = dict;
             uut.Items[key].Should().Be(val);
         }
-        private void setupSpentCoinStateWithValues(SpentCoinState spentCoinState, out UInt256 transactionHash, out uint transactionHeight, out ushort key, out uint dictVal)
+
+        [TestMethod]
+        public void Size_Get()
+        {
+            UInt256 val = new UInt256();
+            Dictionary<ushort, uint> dict = new Dictionary<ushort, uint>();
+            uut.TransactionHash = val;
+            uut.Items = dict;
+            uut.Size.Should().Be(38); // 1 + 32 + 4 + 1 + 0 * (2 + 4)
+        }
+
+        private void setupSpentCoinStateWithValues(SpentCoinState spentCoinState, out UInt256 transactionHash, out uint transactionHeight)
         {
             transactionHash = new UInt256(TestUtils.GetByteArray(32, 0x20));
             spentCoinState.TransactionHash = transactionHash;
             transactionHeight = 757859114;
             spentCoinState.TransactionHeight = transactionHeight;
-            key = new ushort();
-            dictVal = new uint();
             Dictionary<ushort, uint> dict = new Dictionary<ushort, uint>();
-            dict.Add(key, dictVal);
+            dict.Add(42, 100);
             spentCoinState.Items = dict;
         }
+
         [TestMethod]
         public void DeserializeSCS()
-        {           
+        {
             byte[] dataArray = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 2, 42, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
-            Stream stream = new MemoryStream(dataArray);            
+            using (Stream stream = new MemoryStream(dataArray))
+            {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
                     uut.Deserialize(reader);
-                }            
+                }
+            }
             uut.TransactionHash.Should().Be(new UInt256(TestUtils.GetByteArray(32, 0x20)));
             uut.TransactionHeight.Should().Be(757859114);
             uut.Items.Should().ContainKey(42);
             uut.Items[42].Should().Be(0);
         }
+
         [TestMethod]
         public void SerializeSCS()
         {
             UInt256 transactionHash;
             uint transactionHeight;
-            ushort key;
-            uint dictVal;
-            setupSpentCoinStateWithValues(uut, out transactionHash, out transactionHeight, out key, out dictVal);
+            setupSpentCoinStateWithValues(uut, out transactionHash, out transactionHeight);
 
             byte[] dataArray;
             using (MemoryStream stream = new MemoryStream())
@@ -104,15 +117,12 @@ namespace Neo.UnitTests
                     dataArray = stream.ToArray();
                 }
             }
-            byte[] requiredData = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
-            dataArray.Length.Should().Be(44);          
-                for (int i = 0; i < 44; i++)
-                {
-                    dataArray[i].Should().Be(requiredData[i]);
-                }           
+            byte[] requiredData = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 1, 42, 0, 100, 0, 0, 0 };
+            dataArray.Length.Should().Be(44);
+            for (int i = 0; i < 44; i++)
+            {
+                dataArray[i].Should().Be(requiredData[i]);
+            }
         }
-
     }
-
-
 }
