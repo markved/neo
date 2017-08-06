@@ -64,13 +64,24 @@ namespace Neo.UnitTests
         }
 
         [TestMethod]
-        public void Size_Get()
+        public void Size_Get_With_No_Items()
         {
             UInt256 val = new UInt256();
             Dictionary<ushort, uint> dict = new Dictionary<ushort, uint>();
             uut.TransactionHash = val;
             uut.Items = dict;
             uut.Size.Should().Be(38); // 1 + 32 + 4 + 1 + 0 * (2 + 4)
+        }
+
+        [TestMethod]
+        public void Size_Get_With_Items()
+        {
+            UInt256 val = new UInt256();
+            Dictionary<ushort, uint> dict = new Dictionary<ushort, uint>();
+            uut.TransactionHash = val;
+            dict.Add(42, 100);
+            uut.Items = dict;
+            uut.Size.Should().Be(44); // 1 + 32 + 4 + 1 + 1 * (2 + 4)
         }
 
         private void setupSpentCoinStateWithValues(SpentCoinState spentCoinState, out UInt256 transactionHash, out uint transactionHeight)
@@ -87,7 +98,8 @@ namespace Neo.UnitTests
         [TestMethod]
         public void DeserializeSCS()
         {
-            byte[] dataArray = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 2, 42, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 66, 0, 44, 0, 0, 0, 0, 0, 0, 0, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
+            byte[] dataArray = new byte[] { 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 42, 3, 44, 45, 1, 42, 0, 0, 0, 0, 0 };
+                                          
             using (Stream stream = new MemoryStream(dataArray))
             {
                 using (BinaryReader reader = new BinaryReader(stream))
